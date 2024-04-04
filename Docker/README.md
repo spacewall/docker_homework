@@ -1,6 +1,6 @@
 # Docker homework
 
-## The firts task
+## The first task
 Inside the root directory run the following commads:
 - <code>docker build -t static .</code>
 - <code>docker run -p 8080:80</code>

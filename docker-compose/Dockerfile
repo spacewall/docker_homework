@@ -1,10 +1,11 @@
 FROM python:latest
 
+WORKDIR /app
 COPY requirements.txt ./
-RUN pip install -r requirements.txt
+RUN pip install --upgrade pip && pip install gunicorn && pip install -r requirements.txt
 COPY . .
 
-EXPOSE 8080
+EXPOSE 8000
 
-RUN python manage.py migrate
-CMD ["gunicorn", "stocks_products.wsgi", "-b", "0.0.0.0:8080"]
+# CMD ["gunicorn", "stocks_products.wsgi", "-w", "4", "-t", "600", "-b", "0.0.0.0:8000"]
+CMD [ "python", "manage.py", "migrate" ]

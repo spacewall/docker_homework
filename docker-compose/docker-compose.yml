@@ -1,41 +1,49 @@
-version: '3.9'
+volumes:
+  pgdata:
+
+networks:
+  private:
 
 services:
-  web:
-    image: nginx
-    container_name: nginx
-    restart: unless-stopped
-    volumes:
-      - ./templates:/etc/nginx/templates
-    ports:
-      - "8000:80"
-    environment:
-      - NGINX_HOST=localhost
-      - NGINX_PORT=80
-  db: 
+  db:
     image: postgres:alpine
-    container_name: django_postgres
     restart: unless-stopped
-    depends_on:
-      - web
-    ports:
-      - "5434:5432"
     env_file:
       - .env
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U django -d django_db"]
-      interval: 1m30s
-      timeout: 30s
-      retries: 5
-      start_period: 30s
+    volumes:
+      - pgdata:/var/lib/postgresql/data/
+    networks:
+      - private
 
-  django_app:
+  web:
     build: .
-    container_name: django_app
     restart: unless-stopped
     depends_on:
       - db
-    ports:
-      - "8080:8080"
+    env_file:
+      - .env
     volumes:
-      - .:/code
+      - ./static:/app/static
+      - ./media:/app/media
+    networks:
+      - private
+    command:
+      - /bin/sh
+      - -c
+      - |
+        python manage.py collectstatic
+        gunicorn stocks_products.wsgi -w 4 -t 600 -b 0.0.0.0:8000
+
+  nginx:
+    image: nginx:alpine
+    restart: unless-stopped
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf
+      - ./static:/var/www/django/static:ro
+      - ./media:/var/www/django/media:ro
+    depends_on:
+      - web
+    ports:
+      - "8080:80"
+    networks:
+      - private

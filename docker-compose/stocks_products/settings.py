@@ -24,7 +24,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-nw^y+m^wmxza1asgk+)!ua2qx9)g+#v=6%76-9i8i(6eqiw94j'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = ['*']
 
@@ -87,8 +87,8 @@ DATABASES = {
         'NAME': CONFIG['POSTGRES_DB'],
         'USER': CONFIG['POSTGRES_USER'],
         'PASSWORD': CONFIG['POSTGRES_PASSWORD'],
-        'PORT': '5432',
-        'HOST': 'localhost'
+        'HOST': 'db',
+        'PORT': '5432'
     }
 }
 

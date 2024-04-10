@@ -1,5 +1,5 @@
 volumes:
-  pgdata:
+  pg_data:
 
 networks:
   private:
@@ -7,16 +7,24 @@ networks:
 services:
   db:
     image: postgres:alpine
+    container_name: postgres_db
     restart: unless-stopped
     env_file:
       - .env
     volumes:
-      - pgdata:/var/lib/postgresql/data/
+      - pg_data:/var/lib/postgresql/data/
     networks:
       - private
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $POSTGRES_USER -d $POSTGRES_DB"]
+      interval: 1m30s
+      timeout: 30s
+      retries: 5
+      start_period: 30s
 
   web:
     build: .
+    container_name: django_app
     restart: unless-stopped
     depends_on:
       - db
@@ -31,11 +39,13 @@ services:
       - /bin/sh
       - -c
       - |
+        python manage.py migrate
         python manage.py collectstatic
         gunicorn stocks_products.wsgi -w 4 -t 600 -b 0.0.0.0:8000
 
   nginx:
     image: nginx:alpine
+    container_name: nginx
     restart: unless-stopped
     volumes:
       - ./nginx.conf:/etc/nginx/nginx.conf

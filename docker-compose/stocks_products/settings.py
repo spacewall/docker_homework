@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/3.2/ref/settings/
 """
 
 from pathlib import Path
+from dotenv import dotenv_values
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -26,6 +27,8 @@ SECRET_KEY = 'django-insecure-nw^y+m^wmxza1asgk+)!ua2qx9)g+#v=6%76-9i8i(6eqiw94j
 DEBUG = True
 
 ALLOWED_HOSTS = ['*']
+
+CONFIG = dotenv_values('.env')
 
 
 # Application definition
@@ -80,8 +83,12 @@ WSGI_APPLICATION = 'stocks_products.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': 'netology_stocks_products',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': CONFIG['POSTGRES_DB'],
+        'USER': CONFIG['POSTGRES_USER'],
+        'PASSWORD': CONFIG['POSTGRES_PASSWORD'],
+        'PORT': '5432',
+        'HOST': 'localhost'
     }
 }
 
@@ -123,6 +130,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/3.2/howto/static-files/
 
 STATIC_URL = '/static/'
+STATIC_ROOT = './static'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field

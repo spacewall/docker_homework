@@ -1,6 +1,5 @@
 FROM python:latest
 
-WORKDIR /usr/src/project
 COPY requirements.txt ./
 RUN pip install -r requirements.txt
 COPY . .
